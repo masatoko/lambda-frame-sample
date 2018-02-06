@@ -10,12 +10,12 @@ import           Script
 script :: Script ()
 script = do
   t <- getTime
-  -- when (t == 0) $ do
-  --   putStr_ "[RB]:     Shoot"
-  --   putStr_ "[X][Y]:   Transform"
-  --   putStr_ "[LT]:     Left Jet"
-  --   putStr_ "[RT]:     Right Jet"
-  --   putStr_ "(L)Stick: Move"
+  when (t == 0) $ do
+    putStr_ "[RB]:      撃つ"
+    putStr_ "[X][Y]:    変形"
+    putStr_ "[LT]:      左ジェット"
+    putStr_ "[RT]:      右ジェット"
+    putStr_ "(左)ｽﾃｨｯｸ: 移動"
 
   jes <- getJoystickEvents
   -- putStr_ $ show jes
@@ -56,10 +56,6 @@ script = do
   return ()
   where
     setAngleFor name ang = whenJustM (lookupPart name) $ \joint -> setAngle joint ang
-  --
-  --   getJoyHats (JoyHatEvent 0 hs) = hs
-  --   getJoyHats _                  = []
-  --
     setMotor rate =
       mapM_ setMotorRate' names
       where
