@@ -1,4 +1,4 @@
-module Script.Test.Test3 where
+module Test1 where
 
 import           Control.Monad       (forM_, when)
 import           Control.Monad.Extra (whenJust, whenJustM)
