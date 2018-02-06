@@ -1,4 +1,4 @@
-name:                lambda-frame-sample
+name:                script
 version:             0.1.0.0
 -- synopsis:
 -- description:
@@ -16,7 +16,7 @@ library
   build-depends:
       lambda-frame-script
     , base >= 4.7 && < 5
-    --
+    , linear
     , mtl
     , extra
     , binary

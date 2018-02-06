@@ -1,10 +1,11 @@
 module Script.Test.Test3 where
 
-import           Control.Monad       (when, forM_)
+import           Control.Monad       (forM_, when)
 import           Control.Monad.Extra (whenJust, whenJustM)
 import qualified Data.IntMap         as IM
+import           Linear.V2
 
-import           Script.Import
+import           Script
 
 script :: Script ()
 script = do
@@ -59,14 +60,10 @@ script = do
   --   getJoyHats (JoyHatEvent 0 hs) = hs
   --   getJoyHats _                  = []
   --
-    setMotor rate = do
-      setMotorRate' "wheel-l1" rate
-      setMotorRate' "wheel-l2" rate
-      setMotorRate' "wheel-l3" rate
-      setMotorRate' "wheel-r1" rate
-      setMotorRate' "wheel-r2" rate
-      setMotorRate' "wheel-r3" rate
+    setMotor rate =
+      mapM_ setMotorRate' names
       where
-        setMotorRate' name rate =
+        names = ["wheel-" ++ lr:[n] | lr <- "lr", n <- "1,2,3"]
+        setMotorRate' name =
           whenJustM (lookupPart name) $ \wheel ->
             setMotorRate wheel rate
