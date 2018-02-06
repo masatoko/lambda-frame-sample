@@ -1,0 +1,6 @@
+resolver: lts-7.24
+compiler: ghc-8.0.1
+
+packages:
+- .
+- ../../lambda-frame-script
