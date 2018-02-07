@@ -9,9 +9,11 @@ import           Script              (ButtonState (..), JetOperation (..),
                                       JoystickEvent (..), Script)
 import qualified Script              as S -- ゲームのコマンド
 
+-- このscript関数がフレームごとに呼ばれる。
 script :: Script ()
 script = do
   -- '--'で始まる行はコメント扱い
+  -- ここにある関数が、上から順に実行される。
   t <- S.getTime -- フレーム時刻を得る
   when (t == 0) $ do
     -- 最初の時刻の場合ここが実行される
