@@ -3,7 +3,6 @@ module Test1 where
 import           Control.Monad       (forM_, when)
 import           Control.Monad.Extra (whenJust, whenJustM)
 import qualified Data.IntMap         as IM -- 整数専用のマップ
-import           Linear.V2
 
 import           Script              (ButtonState (..), JetOperation (..),
                                       JoystickEvent (..), Script)
