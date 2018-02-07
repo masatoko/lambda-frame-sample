@@ -5,61 +5,59 @@ import           Control.Monad.Extra (whenJust, whenJustM)
 import qualified Data.IntMap         as IM
 import           Linear.V2
 
-import           Script
+import           Script              (ButtonState (..), JetOperation (..),
+                                      JoystickEvent (..), Script)
+import qualified Script              as S
 
 script :: Script ()
 script = do
-  t <- getTime
+  t <- S.getTime
   when (t == 0) $ do
-    putStr_ "[RB]:      撃つ"
-    putStr_ "[X][Y]:    変形"
-    putStr_ "[LT]:      左ジェット"
-    putStr_ "[RT]:      右ジェット"
-    putStr_ "(左)ｽﾃｨｯｸ: 移動"
+    S.putStr_ "[RB]:      撃つ"
+    S.putStr_ "[X][Y]:    変形"
+    S.putStr_ "[LT]:      左ジェット"
+    S.putStr_ "[RT]:      右ジェット"
+    S.putStr_ "(左)ｽﾃｨｯｸ: 移動"
 
-  jes <- getJoystickEvents
+  jes <- S.getJoystickEvents
   -- putStr_ $ show jes
-  axes <- getJoyAxes
+  axes <- S.getJoyAxes
   -- putStr_ $ show axes
 
   -- ** Gun
-  when (JoystickEvent 5 Pressed `elem` jes) $ do
-    whenJustM (lookupPart "gun-l1") shootGun
-    whenJustM (lookupPart "gun-l2") shootGun
-    whenJustM (lookupPart "gun-r1") shootGun
-    whenJustM (lookupPart "gun-r2") shootGun
+  when (S.JoystickEvent 5 S.Pressed `elem` jes) $ do
+    S.shootGun "gun-l1"
+    S.shootGun "gun-l2"
+    S.shootGun "gun-r1"
+    S.shootGun "gun-r2"
   --
   -- ** Wheel
   whenJust (IM.lookup 0 axes) $ \d ->
-    when (abs d > 0.2) $ setMotor $ -4 * d
+    when (abs d > 0.2) $ do
+      let work name = S.addRotImpulse name (-4 * d)
+      work "wheel-l1"
+      work "wheel-l2"
+      work "wheel-l3"
+      work "wheel-r1"
+      work "wheel-r2"
+      work "wheel-r3"
 
   when (JoystickEvent 2 Pressed `elem` jes) $ do
-    setAngleFor "jnt-l" 0
-    setAngleFor "jnt-r" 0
+    S.setAngle "jnt-l" 0
+    S.setAngle "jnt-r" 0
   when (JoystickEvent 3 Pressed `elem` jes) $ do
-    setAngleFor "jnt-l" $ pi/2
-    setAngleFor "jnt-r" $ -pi/2
+    S.setAngle "jnt-l" $ pi/2
+    S.setAngle "jnt-r" $ -pi/2
 
-  whenJust (IM.lookup 2 axes) $ \rate ->
-    whenJustM (lookupPart "jet-l") $ \jet -> do
-      let rate' = (rate + 1) / 2
-      if rate' < 0.2
-        then setJetOperation jet Nothing
-        else setJetOperation jet $ Just $ JetOpPower $ 10 * rate'
-  whenJust (IM.lookup 5 axes) $ \rate ->
-    whenJustM (lookupPart "jet-r") $ \jet -> do
-      let rate' = (rate + 1) / 2
-      if rate' < 0.2
-        then setJetOperation jet Nothing
-        else setJetOperation jet $ Just $ JetOpPower $ 10 * rate'
-
-  return ()
-  where
-    setAngleFor name ang = whenJustM (lookupPart name) $ \joint -> setAngle joint ang
-    setMotor rate =
-      mapM_ setMotorRate' names
-      where
-        names = ["wheel-" ++ lr:[n] | lr <- "lr", n <- "1,2,3"]
-        setMotorRate' name =
-          whenJustM (lookupPart name) $ \wheel ->
-            setMotorRate wheel rate
+  whenJust (IM.lookup 2 axes) $ \rate -> do
+    let name = "jet-l"
+        rate' = (rate + 1) / 2
+    if rate' < 0.2
+      then S.setJetOperation name Nothing
+      else S.setJetOperation name $ Just $ JetOpPower $ 10 * rate'
+  whenJust (IM.lookup 5 axes) $ \rate -> do
+    let name = "jet-r"
+        rate' = (rate + 1) / 2
+    if rate' < 0.2
+      then S.setJetOperation name Nothing
+      else S.setJetOperation name $ Just $ JetOpPower $ 10 * rate'
