@@ -8,6 +8,8 @@ import           Script              (ButtonState (..), JetOperation (..),
                                       JoystickEvent (..), Script)
 import qualified Script              as S -- ゲームのコマンド
 
+import qualified Input.XBox360       as X -- XBox360コントローラのボタン・軸番号が定義されたモジュール
+
 -- 毎時刻、このscript関数が呼ばれる。
 -- その時刻に、君のロボットをどう動かすかを、この関数の中に書こう。
 script :: Script ()
@@ -30,14 +32,14 @@ script = do
   -- putStr_ $ show axes
 
   -- === Gun - 機銃
-  when (S.JoystickEvent 5 S.Pressed `elem` jes) $ do -- ボタン５が押されているとき
+  when (S.JoystickEvent X.btnR S.Pressed `elem` jes) $ do -- ボタンRが押されているとき
     S.shootGun "gun-l1" -- gun-l1 の名前のGunから弾を撃つ。
     S.shootGun "gun-l2"
     S.shootGun "gun-r1"
     S.shootGun "gun-r2"
   --
   -- === Wheel - ホイール
-  whenJust (IM.lookup 0 axes) $ \d -> -- 軸０の値（スティックの傾き）を探す。
+  whenJust (IM.lookup X.axisLStickX axes) $ \d -> -- 左スティックのX軸の値（傾き）を探す。
     when (abs d > 0.2) $ do -- 絶対値が指定値より大きい場合（dは -1 以上 1 以下の値をとる）
       let work name = S.addRotImpulse name (-4 * d) -- name の名前のホイールを回転させる関数を定義する。正の値は時計回り。
       work "wheel-l1"
@@ -48,21 +50,21 @@ script = do
       work "wheel-r3"
 
   -- === Joint - ジョイント
-  when (JoystickEvent 2 Pressed `elem` jes) $ do
+  when (JoystickEvent X.btnX Pressed `elem` jes) $ do
     S.setAngle "jnt-l" 0 -- ジョイントの角度を０に指定
     S.setAngle "jnt-r" 0
-  when (JoystickEvent 3 Pressed `elem` jes) $ do
+  when (JoystickEvent X.btnY Pressed `elem` jes) $ do
     S.setAngle "jnt-l" $ pi/2 -- ジョイントの角度を pi / 2 に指定
     S.setAngle "jnt-r" $ -pi/2
 
   -- === Jet - ジェット
-  whenJust (IM.lookup 2 axes) $ \rate -> do
+  whenJust (IM.lookup X.axisLTrigger axes) $ \rate -> do
     let name = "jet-l"
         rate' = (rate + 1) / 2
     if rate' < 0.2
       then S.setJetOperation name Nothing -- ジェットを切る
       else S.setJetOperation name $ Just $ JetOpPower $ 10 * rate' -- ジェットを設定
-  whenJust (IM.lookup 5 axes) $ \rate -> do
+  whenJust (IM.lookup X.axisRTrigger axes) $ \rate -> do
     let name = "jet-r"
         rate' = (rate + 1) / 2
     if rate' < 0.2
