@@ -26,6 +26,7 @@ script = do
     S.putStr_ "(LT)    / [Q]   : 左ジェット"
     S.putStr_ "(RT)    / [E]   : 右ジェット"
     S.putStr_ "左ｽﾃｨｯｸ / [A][D]: 移動"
+    S.putStr_ "(*) 文章を表示すると遅くなるため、非表示推奨。" -- 動作が遅い場合は一連の'putStr_'をコメントアウトしてください
 
   kes <- S.getKeyboardEvents -- キーボードのイベントを得る。
   let isKeyPressed key = event `elem` kes
