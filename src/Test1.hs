@@ -44,10 +44,10 @@ script = do
 
   -- === Gun - 機銃
   when (isBtnPressed X.btnR || isKeyPressed K.Key'J) $ do -- どちらかが真ならば
-    S.shootGun "gun-l1" -- gun-l1 の名前のGunから弾を撃つ。
-    S.shootGun "gun-l2"
-    S.shootGun "gun-r1"
-    S.shootGun "gun-r2"
+    S.command $ S.ShootGun "gun-l1" -- gun-l1 の名前のGunから弾を撃つ。
+    S.command $ S.ShootGun "gun-l2"
+    S.command $ S.ShootGun "gun-r1"
+    S.command $ S.ShootGun "gun-r2"
   --
   -- === Wheel - ホイール
   holdingA <- S.getKeyboardState K.Key'A
@@ -62,7 +62,7 @@ script = do
                               then axisX
                               else 0
   when (movex /= 0) $ do
-    let work name = S.addRotImpulse name (-4 * movex) -- name の名前のホイールを回転させる関数を定義する。正の値は時計回り。
+    let work name = S.command $ S.AddRotImpulse name (-4 * movex) -- name の名前のホイールを回転させる関数を定義する。正の値は時計回り。
     work "wheel-l1"
     work "wheel-l2"
     work "wheel-l3"
@@ -72,11 +72,11 @@ script = do
 
   -- === Joint - ジョイント
   when (isBtnPressed X.btnX || isKeyPressed K.Key'W) $ do
-    S.setAngle "jnt-l" 0 -- ジョイントの角度を０に指定
-    S.setAngle "jnt-r" 0
+    S.command $ S.SetAngle "jnt-l" 0 -- ジョイントの角度を０に指定
+    S.command $ S.SetAngle "jnt-r" 0
   when (isBtnPressed X.btnY || isKeyPressed K.Key'S) $ do
-    S.setAngle "jnt-l" $ pi/2 -- ジョイントの角度を pi / 2 に指定
-    S.setAngle "jnt-r" $ -pi/2
+    S.command $ S.SetAngle "jnt-l" $ pi/2 -- ジョイントの角度を pi / 2 に指定
+    S.command $ S.SetAngle "jnt-r" $ -pi/2
 
   -- === Jet - ジェット
   -- 左ジェット
@@ -88,8 +88,8 @@ script = do
                         _      -> 0
   let name = "jet-l"
   if jetLStrength < 0.2
-    then S.setJetOperation name Nothing -- ジェットを切る
-    else S.setJetOperation name $ Just $ JetOpPower jetLStrength -- ジェットを設定
+    then S.command $ S.SetJetOperation name Nothing -- ジェットを切る
+    else S.command $ S.SetJetOperation name $ Just $ JetOpPower jetLStrength -- ジェットを設定
   -- 右ジェット
   holdingE <- S.getKeyboardState K.Key'E
   let jetRStrength
@@ -99,5 +99,5 @@ script = do
                         _      -> 0
   let name = "jet-r"
   if jetRStrength < 0.2
-    then S.setJetOperation name Nothing
-    else S.setJetOperation name $ Just $ JetOpPower jetRStrength
+    then S.command $ S.SetJetOperation name Nothing
+    else S.command $ S.SetJetOperation name $ Just $ JetOpPower jetRStrength
